@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Speed Writer</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <style>
+/* CSS MINIMAL RESET*/
+html {box-sizing: border-box;font-size: 16px;}
+*, *:before, *:after {box-sizing: border-box;}
+body, h1, h2, h3, h4, h5, h6, p, ol, ul { margin: 0;padding: 0;font-weight: normal;}
+ol, ul {list-style: none;}
+img {max-width: 100%;height: auto;}
+
+body {
+      background:  #eee;
+      margin-top: 25px; 
+      text-align: center;
+      font-family: monospace;
+      font-size: 40px;
+      color: #111;
+}
+
+.redText
+{
+    color:red;
+}
+.greenText
+{
+    color:green;
+}
+.blackText
+{
+  color:green;
+}
+
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div>{{title}}</div>
+    <div><p id="writeMsg">{{toWriteMessage}}</p></div>    
+    <user_input></user_input>
+  </div>
+  <script>
+    Vue.component('user_input', 
+     {
+        data: () =>  {
+        return {
+          message : '',
+        }
+      },
+      template: '<div><p style="white-space: pre-line;">{{ message }}</p><textarea v-model="message" placeholder="add multiple lines"></textarea></div>',
+      watch: {
+        message: function () {
+          var compare = app.toWriteMessage.substring(0, this.message.length)
+          var same = true
+          if(compare.length === this.message.length)
+          {
+            for (var i = 0; i < compare.length ; i++)
+            {
+              var messageChar = this.message.charAt(i)
+              var compareChar = compare.charAt(i)
+              if(compareChar === messageChar && same)
+              {
+                console.log(messageChar + ": " + compareChar + " are equal")
+                // document.getElementById('writeMsg').style.color = "green"
+
+                var newString = '<span class="greenText">' + this.message +  '</span>'
+                document.getElementById('writeMsg').html = newString
+              }
+              else{
+                same = false
+                // document.getElementById('writeMsg').style.color = "red"
+
+              }
+            }
+          }
+        }
+      }
+    })
+
+    var app = new Vue({
+      el: '#app',
+      data: {
+        title: 'Speed Writer',
+        isCorrect: false,
+        toWriteMessage: '<span>select a message for the user to write and verify if the messasge is corret to each imnput. If yes , set gree values for the letters enter correctly. If no, set red to the letters incorrect</span>'
+      }
+    })
+  </script>
+</body>
+</html>
