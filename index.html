@@ -20,13 +20,13 @@ body {
       color: #111;
 }
 
-.redText
-{
-    color:red;
-}
 .greenText
 {
     color:green;
+}
+.redText
+{
+    color:red;
 }
 .blackText
 {
@@ -59,28 +59,31 @@ body {
       watch: {
         message: function () {
           var compare = app.toWriteMessage.substring(0, this.message.length)
-          var same = true
+          var erroIndex = null;
           if(compare.length === this.message.length)
           {
             for (var i = 0; i < compare.length ; i++)
             {
               var messageChar = this.message.charAt(i)
               var compareChar = compare.charAt(i)
-              if(compareChar === messageChar && same)
+              if(compareChar !== messageChar)
               {
-                console.log(messageChar + ": " + compareChar + " are equal")
-                // document.getElementById('writeMsg').style.color = "green"
-
-                var newString = '<span class="greenText">' + this.message +  '</span>'
-                // document.getElementById('writeMsg').html = newString
-              }
-              else{
-                same = false
-                // document.getElementById('writeMsg').style.color = "red"
-
+                erroIndex = i;
+                break;
               }
             }
           }
+          if(erroIndex !== null)
+          {
+            // app.validTxt = 
+            // app.invalidTxt = 
+
+            // app.restTxt = 
+          }
+         else{
+            app.validTxt = compare
+            app.restTxt = app.toWriteMessage.substring(compare.length, app.toWriteMessage.length)
+         }
         }
       }
     })
