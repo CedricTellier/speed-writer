@@ -30,7 +30,7 @@ body {
 }
 .blackText
 {
-  color:green;
+  color:black;
 }
 
   </style>
@@ -38,7 +38,13 @@ body {
 <body>
   <div id="app">
     <div>{{title}}</div>
-    <div><p id="writeMsg">{{toWriteMessage}}</p></div>    
+    <div><p id="">
+      <span class="greenText">{{validTxt}}</span>
+      <span class="redText">{{invalidTxt}}</span>
+      <span class="blackText">{{restTxt}}</span>
+
+      {{toWriteMessage}}</p></div>    
+
     <user_input></user_input>
   </div>
   <script>
@@ -49,7 +55,7 @@ body {
           message : '',
         }
       },
-      template: '<div><p style="white-space: pre-line;">{{ message }}</p><textarea v-model="message" placeholder="add multiple lines"></textarea></div>',
+      template: '<div><p style="white-space: pre-line;display:none">{{ message }}</p><textarea v-model="message" placeholder="add multiple lines"></textarea></div>',
       watch: {
         message: function () {
           var compare = app.toWriteMessage.substring(0, this.message.length)
@@ -66,7 +72,7 @@ body {
                 // document.getElementById('writeMsg').style.color = "green"
 
                 var newString = '<span class="greenText">' + this.message +  '</span>'
-                document.getElementById('writeMsg').html = newString
+                // document.getElementById('writeMsg').html = newString
               }
               else{
                 same = false
@@ -84,7 +90,10 @@ body {
       data: {
         title: 'Speed Writer',
         isCorrect: false,
-        toWriteMessage: '<span>select a message for the user to write and verify if the messasge is corret to each imnput. If yes , set gree values for the letters enter correctly. If no, set red to the letters incorrect</span>'
+        validTxt: '',
+        invalidTxt: '',
+        restTxt: 'select a message for the user to write and verify if the messasge is corret to each imnput. If yes , set gree values for the letters enter correctly. If no, set red to the letters incorrect',
+        toWriteMessage: 'select a message for the user to write and verify if the messasge is corret to each imnput. If yes , set gree values for the letters enter correctly. If no, set red to the letters incorrect'
       }
     })
   </script>
