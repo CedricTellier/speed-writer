@@ -66,18 +66,19 @@
 <body>
   <div id="app">
     <div>{{title}}</div>
-    <div>
-      <div id="clock" style="font-size: 25pxs;">Timer {{ hours }}:{{ minutes }}:{{ seconds }}</div>
-      <p id="" style="white-space: normal;">
-        <span class="greenText">{{validTxt}}</span>
-        <span class="redText">{{invalidTxt}}</span>
-        <span class="blackText">{{restTxt}}</span>
-      </p>
+    <button v-if="!startGAme" v-on:click="reset">Start Game</button>
+    <div v-if="startGAme">
+      <div>
+        <div id="clock" style="font-size: 25pxs;">Timer {{ hours }}:{{ minutes }}:{{ seconds }}</div>
+        <p style="white-space: normal;">
+          <span class="greenText">{{validTxt}}</span>
+          <span class="redText">{{invalidTxt}}</span>
+          <span class="blackText">{{restTxt}}</span>
+        </p>
+      </div>
+      <user_input></user_input>
     </div>
-    <user_input></user_input>
     <div style="margin-top:45px" v-if="isWinner">
-      <!-- <div>Temps total : {{totalTime}}</div> -->
-      <!-- <div>Temps total : {{wordPerMinutes}}</div> -->
       <div>Nombre d'erreur : {{errorCount}}</div>
       <button v-on:click="reset">{{resetMsg}}</button>
     </div>
@@ -85,12 +86,12 @@
   <script>
     Vue.component('user_input',
       {
-        data: function loader (){
+        data: function loader() {
           return {
             message: '',
           }
         },
-        template: '<div style="margin-top:45px"><p style="display:none">{{ message }}</p><textarea v-model="message" placeholder="add multiple lines" style="height:125px;width:560px" autofocus></textarea></div>',
+        template: '<div style="margin-top:45px"><p style="display:none">{{ message }}</p><textarea id="txtArea" v-model="message" placeholder="add multiple lines" style="height:125px;width:560px" autofocus></textarea></div>',
         watch: {
           message: function () {
             var compare = app.toWriteMessage.substring(0, this.message.length)
@@ -108,15 +109,16 @@
             }
             if (erroIndex !== null) {
               app.validTxt = app.toWriteMessage.substring(0, erroIndex)
-              app.invalidTxt = app.toWriteMessage.substring(erroIndex  , this.message.length)
+              app.invalidTxt = app.toWriteMessage.substring(erroIndex, this.message.length)
             }
             else {
               app.validTxt = compare
               app.invalidTxt = ''
             }
             app.restTxt = app.toWriteMessage.substring(compare.length, app.toWriteMessage.length)
-            if(app.validTxt.length === app.toWriteMessage.length) {
+            if (app.validTxt.length === app.toWriteMessage.length) {
               app.isWinner = true;
+              document.getElementById("txtArea").disabled = true
               clearTimeout(timer)
             }
           }
@@ -126,8 +128,9 @@
     var app = new Vue({
       el: '#app',
       data: {
+        startGAme: false,
         title: 'Speed Writer',
-        errorCount:0,
+        errorCount: 0,
         isCorrect: false,
         validTxt: '',
         invalidTxt: '',
@@ -151,27 +154,29 @@
           app.hours = calcHou > 9 ? calcHou : '0' + calcHou
         },
         reset: () => {
+          app.startGAme = true,
           app.time = 0,
           app.seconds = '00',
           app.minutes = '00',
           app.hours = '00',
           app.errorCount = 0,
-          app.isCorrect=  false,
-          app.validTxt= '',
-          app.invalidTxt=  '',
-          app.isWinner=  false,
-          app.restTxt=  'test',
-          app.toWriteMessage=  'test'
-          document.querySelectorAll('textarea').forEach(function(txt){
+          app.isCorrect = false,
+          app.validTxt = '',
+          app.invalidTxt = '',
+          app.isWinner = false,
+          app.restTxt = 'test',
+          app.toWriteMessage = 'test'
+          var txt = document.getElementById("txtArea")
+          if(txt !== null) {
             txt.value = ''
-            txt.autofocus = true;
-          })
-          timer = setInterval(app.launchTimer, 1000)
+            txt.disabled = false
+            txt.focus()
+            timer = setInterval(app.launchTimer, 1000)
+          }
         }
       }
     })
     var timer = setInterval(app.launchTimer, 1000)
-
   </script>
 </body>
 </html>
