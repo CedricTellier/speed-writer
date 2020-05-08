@@ -1,104 +1,177 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Speed Writer</title>
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
   <style>
-/* CSS MINIMAL RESET*/
-html {box-sizing: border-box;font-size: 16px;}
-*, *:before, *:after {box-sizing: border-box;}
-body, h1, h2, h3, h4, h5, h6, p, ol, ul { margin: 0;padding: 0;font-weight: normal;}
-ol, ul {list-style: none;}
-img {max-width: 100%;height: auto;}
+    /* CSS MINIMAL RESET*/
+    html {
+      box-sizing: border-box;
+      font-size: 16px;
+    }
 
-body {
-      background:  #eee;
-      margin-top: 25px; 
+    *,
+    *:before,
+    *:after {
+      box-sizing: border-box;
+    }
+
+    body,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    ol,
+    ul {
+      margin: 0;
+      padding: 0;
+      font-weight: normal;
+    }
+
+    ol,
+    ul {
+      list-style: none;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    body {
+      background: #eee;
+      margin-top: 25px;
       text-align: center;
       font-family: monospace;
       font-size: 40px;
       color: #111;
-}
+    }
 
-.greenText
-{
-    color:green;
-}
-.redText
-{
-    color:red;
-}
-.blackText
-{
-  color:black;
-}
+    .greenText {
+      background-color: green;
+      color: black;
+    }
 
+    .redText {
+      background-color: red;
+      color: black;
+    }
   </style>
 </head>
+
 <body>
   <div id="app">
     <div>{{title}}</div>
-    <div><p id="">
-      <span class="greenText">{{validTxt}}</span>
-      <span class="redText">{{invalidTxt}}</span>
-      <span class="blackText">{{restTxt}}</span>
-
-      {{toWriteMessage}}</p></div>    
-
+    <div>
+      <div id="clock" style="font-size: 25pxs;">Timer {{ hours }}:{{ minutes }}:{{ seconds }}</div>
+      <p id="" style="white-space: normal;">
+        <span class="greenText">{{validTxt}}</span>
+        <span class="redText">{{invalidTxt}}</span>
+        <span class="blackText">{{restTxt}}</span>
+      </p>
+    </div>
     <user_input></user_input>
+    <div style="margin-top:45px" v-if="isWinner">
+      <!-- <div>Temps total : {{totalTime}}</div> -->
+      <!-- <div>Temps total : {{wordPerMinutes}}</div> -->
+      <div>Nombre d'erreur : {{errorCount}}</div>
+      <button v-on:click="reset">{{resetMsg}}</button>
+    </div>
   </div>
   <script>
-    Vue.component('user_input', 
-     {
-        data: () =>  {
-        return {
-          message : '',
-        }
-      },
-      template: '<div><p style="white-space: pre-line;display:none">{{ message }}</p><textarea v-model="message" placeholder="add multiple lines"></textarea></div>',
-      watch: {
-        message: function () {
-          var compare = app.toWriteMessage.substring(0, this.message.length)
-          var erroIndex = null;
-          if(compare.length === this.message.length)
-          {
-            for (var i = 0; i < compare.length ; i++)
-            {
-              var messageChar = this.message.charAt(i)
-              var compareChar = compare.charAt(i)
-              if(compareChar !== messageChar)
-              {
-                erroIndex = i;
-                break;
+    Vue.component('user_input',
+      {
+        data: function loader (){
+          return {
+            message: '',
+          }
+        },
+        template: '<div style="margin-top:45px"><p style="display:none">{{ message }}</p><textarea v-model="message" placeholder="add multiple lines" style="height:125px;width:560px" autofocus></textarea></div>',
+        watch: {
+          message: function () {
+            var compare = app.toWriteMessage.substring(0, this.message.length)
+            var erroIndex = null;
+            if (compare.length === this.message.length) {
+              for (var i = 0; i < compare.length; i++) {
+                var messageChar = this.message.charAt(i)
+                var compareChar = compare.charAt(i)
+                if (compareChar !== messageChar) {
+                  erroIndex = i;
+                  app.errorCount++
+                  break;
+                }
               }
             }
-          }
-          if(erroIndex !== null)
-          {
-            // app.validTxt = 
-            // app.invalidTxt = 
-
-            // app.restTxt = 
-          }
-         else{
-            app.validTxt = compare
+            if (erroIndex !== null) {
+              app.validTxt = app.toWriteMessage.substring(0, erroIndex)
+              app.invalidTxt = app.toWriteMessage.substring(erroIndex  , this.message.length)
+            }
+            else {
+              app.validTxt = compare
+              app.invalidTxt = ''
+            }
             app.restTxt = app.toWriteMessage.substring(compare.length, app.toWriteMessage.length)
-         }
+            if(app.validTxt.length === app.toWriteMessage.length) {
+              app.isWinner = true;
+              clearTimeout(timer)
+            }
+          }
         }
-      }
-    })
+      })
 
     var app = new Vue({
       el: '#app',
       data: {
         title: 'Speed Writer',
+        errorCount:0,
         isCorrect: false,
         validTxt: '',
         invalidTxt: '',
-        restTxt: 'select a message for the user to write and verify if the messasge is corret to each imnput. If yes , set gree values for the letters enter correctly. If no, set red to the letters incorrect',
-        toWriteMessage: 'select a message for the user to write and verify if the messasge is corret to each imnput. If yes , set gree values for the letters enter correctly. If no, set red to the letters incorrect'
+        isWinner: false,
+        restTxt: 'test',
+        toWriteMessage: 'test',
+        resetMsg: 'Rejouer !',
+        time: 0,
+        seconds: '00',
+        minutes: '00',
+        hours: '00',
+      },
+      methods: {
+        launchTimer: () => {
+          app.time += 1
+          const calcSec = app.time % 60
+          const calcMin = Math.floor(app.time / 60)
+          const calcHou = Math.floor(app.time / 60 / 60)
+          app.seconds = calcSec > 9 ? calcSec : '0' + calcSec
+          app.minutes = calcMin > 9 ? calcMin : '0' + calcMin
+          app.hours = calcHou > 9 ? calcHou : '0' + calcHou
+        },
+        reset: () => {
+          app.time = 0,
+          app.seconds = '00',
+          app.minutes = '00',
+          app.hours = '00',
+          app.errorCount = 0,
+          app.isCorrect=  false,
+          app.validTxt= '',
+          app.invalidTxt=  '',
+          app.isWinner=  false,
+          app.restTxt=  'test',
+          app.toWriteMessage=  'test'
+          document.querySelectorAll('textarea').forEach(function(txt){
+            txt.value = ''
+            txt.autofocus = true;
+          })
+          timer = setInterval(app.launchTimer, 1000)
+        }
       }
     })
+    var timer = setInterval(app.launchTimer, 1000)
+
   </script>
 </body>
 </html>
